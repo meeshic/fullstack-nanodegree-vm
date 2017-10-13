@@ -61,11 +61,12 @@ class webServerHandler(BaseHTTPRequestHandler):
 				self.end_headers()
 				output = ""
 				output += "<html><body>"
-				output += '''<ul style="list-style-type:none">'''
 				restaurants = session.query(Restaurant).all()
 				for restaurant in restaurants:
-					output += "<li>%s</li>" % restaurant.name
-				output += "</ul>"
+					output += restaurant.name
+					output += "</br>"
+					output += "<a href>Edit</a></br>"
+					output += "<a href>Delete</a></br>"
 				output += "</html></body>"
 				self.wfile.write(output)
 				print output
