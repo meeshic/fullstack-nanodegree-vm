@@ -17,10 +17,10 @@ session = DBSession()
 # @ wraps func inside the app.route func that Flask has already created
 # calls func that follows whenever server receives request with matching URL
 @app.route('/')
-@app.route('/hello')
+@app.route('/restaurants/<int:restaurant_id>/')
 # if the above routes are sent from browser, below func code is executed
-def HelloWorld():
-	restaurant = session.query(Restaurant).first()
+def restaurantMenu(restaurant_id):
+	restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
 	items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
 	output = ''
 	for i in items:
