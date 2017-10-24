@@ -1,5 +1,5 @@
 # import Flask class from Flask library
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 # for db CRUD ops
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -26,21 +26,46 @@ def restaurantMenu(restaurant_id):
 	
 # Task 1: Create route for newMenuItem function here
 
-@app.route('/restaurants/<int:restaurant_id>/new/')
+@app.route('/restaurants/<int:restaurant_id>/new/', methods=['GET','POST'])
 def newMenuItem(restaurant_id):
-	return "page to create a new menu item. Task 1 complete!"
+	if request.method == 'POST':
+		newItem = MenuItem(name=request.form['name'], 
+			restaurant_id=restaurant_id)
+		session.add(newItem)
+		session.commit()
+		return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+	else:
+		return render_template('newmenuitem.html', restaurant_id=restaurant_id) 
 
 # Task 2: Create route for editMenuItem function here
 
-@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit/')
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit/', 
+	methods=['GET','POST'])
 def editMenuItem(restaurant_id, menu_id):
-	return "page to edit a menu item. Task 2 complete!"
+	editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+	if request.method == 'POST':
+		if request.form['name']:
+			editedItem.name = request.form['name']
+			session.add(editedItem)
+			session.commit()
+			return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+	else:
+		return render_template('editmenuitem.html', 
+			restaurant_id=restaurant_id, item=editedItem)
 
 # Task 3: Create a route for deleteMenuItem function here
 
-@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete/')
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete/', 
+	methods=['GET','POST'])
 def deleteMenuItem(restaurant_id, menu_id):
-	return "page to delete a menu item. Task 3 complete!"
+	deletedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+	if request.method == 'POST':
+		session.delete(deletedItem)
+		session.commit()
+		return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+	else:
+		return render_template('deletemenuitem.html', item=deletedItem)
+		
 
 # if statement ensures that server only runs if script is run directly
 #	from Python interpreter & not used as an imported module
