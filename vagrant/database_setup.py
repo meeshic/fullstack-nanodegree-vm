@@ -24,7 +24,19 @@ class MenuItem(Base):
 	price = Column(String(8))
 	course = Column(String(250))
 	restaurant_id = Column(Integer,ForeignKey('restaurant.id'))
-	restaurant = relationship(Restaurant) 
+	restaurant = relationship(Restaurant)
+
+	# Defines and formats what data to send across
+	@property
+	def serialize(self):
+		#Returns obj data in easily serializeable format
+		return {
+			'name': self.name,
+			'description': self.description,
+			'id': self.id,
+			'price': self.price,
+			'course': self.course,
+		}
 
 
 # at end of file #
