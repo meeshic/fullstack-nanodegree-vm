@@ -1,5 +1,5 @@
 # import Flask class from Flask library
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, flash
 # for db CRUD ops
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -33,6 +33,7 @@ def newMenuItem(restaurant_id):
 			restaurant_id=restaurant_id)
 		session.add(newItem)
 		session.commit()
+		flash("new menu item created!")
 		return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
 	else:
 		return render_template('newmenuitem.html', restaurant_id=restaurant_id) 
@@ -48,6 +49,7 @@ def editMenuItem(restaurant_id, menu_id):
 			editedItem.name = request.form['name']
 			session.add(editedItem)
 			session.commit()
+			flash("Menu Item Edited!")
 			return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
 	else:
 		return render_template('editmenuitem.html', 
@@ -62,6 +64,7 @@ def deleteMenuItem(restaurant_id, menu_id):
 	if request.method == 'POST':
 		session.delete(deletedItem)
 		session.commit()
+		flash("Menu Item Deleted!")
 		return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
 	else:
 		return render_template('deletemenuitem.html', item=deletedItem)
@@ -70,6 +73,8 @@ def deleteMenuItem(restaurant_id, menu_id):
 # if statement ensures that server only runs if script is run directly
 #	from Python interpreter & not used as an imported module
 if __name__ == '__main__':
+	# Flask uses secret key to create sessions for users 
+	app.secret_key = 'super_secret_key'
 	# in debug mode, user of app can execute arbitrary Python code on comp
 	app.debug = True
 	# run func runs local server with app
